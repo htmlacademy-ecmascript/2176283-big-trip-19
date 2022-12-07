@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Иван Пелипенко](https://up.htmlacademy.ru/ecmascript/19/user/2176283).
-* Наставник: `Неизвестно`.
+* Наставник: [Антон Попов](https://htmlacademy.ru/profile/joker).
 
 ---
 
