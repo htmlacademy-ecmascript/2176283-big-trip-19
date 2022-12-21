@@ -6,25 +6,27 @@ import newPointView from '../view/new-point-view.js';
 import editPointView from '../view/edit-point-view.js';
 import {render} from '../render.js';
 
-const NUMBER_OF_WAYPOINTS = 3;
 
 export default class ListPresenter {
   pageComponent = new createPageTemplate();
   listComponent = new listView();
 
-  constructor({listContainer}) {
+  constructor({listContainer, pointsModel}) {
     this.listContainer = listContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    this.listPoints = [...this.pointsModel.getPoints()];
+
     render(this.pageComponent, this.listContainer);
     render(new sortingView(), this.pageComponent.getElement());
-    render(new newPointView(),this.pageComponent.getElement());
-    render(new editPointView(), this.pageComponent.getElement());
+    render(new newPointView(),this.listComponent.getElement());
+    render(new editPointView(), this.listComponent.getElement());
     render(this.listComponent, this.pageComponent.getElement());
 
-    for (let i = 0; i < NUMBER_OF_WAYPOINTS; i++) {
-      render(new waypointView(), this.listComponent.getElement());
+    for (let i = 0; i < this.listPoints.length; i++) {
+      render(new waypointView({point: this.listPoints[i]}), this.listComponent.getElement());
     }
 
   }
