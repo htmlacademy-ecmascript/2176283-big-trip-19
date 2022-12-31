@@ -1,11 +1,11 @@
-import {createElement} from '../render.js';
+import { createElement } from '../render.js';
 
 function createPageTemplate() {
   return (`<main class="page-body__page-main  page-main">
   </main>`);
 }
 
-export default class waypointView {
+export default class PageView {
   getTemplate() {
     return createPageTemplate();
   }

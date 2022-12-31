@@ -1,6 +1,19 @@
-import {createElement} from '../render.js';
-
+import { createElement } from '../render.js';
+//import { TYPE } from '../const.js';
+/*
+const BLANK_POINT = {
+  basePrice: '',
+  dateFrom: '',
+  dateTo: '',
+  destination: ' ',
+  isFavorite: true,
+  offers: '',
+  type: ''
+};
+*/
 function createNewPointTemplate() {
+// const {basePrice, dateTo, dateFrom, destination, isFavorite, offers, type} = data;
+
   return (`<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -165,9 +178,13 @@ function createNewPointTemplate() {
 </li>`);
 }
 
-export default class newPointView {
+export default class NewPointView {
+  /*constructor({point = BLANK_POINT}) {
+    this.point = point;
+  }
+*/
   getTemplate() {
-    return createNewPointTemplate();
+    return createNewPointTemplate(/*this.point*/);
   }
 
   getElement() {

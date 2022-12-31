@@ -1,14 +1,32 @@
-import {createElement} from '../render.js';
-import {humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime} from '../utils.js';
+import { createElement } from '../render.js';
+import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils.js';
+import { offersByType } from '../mock/points.js';
 
-
-function createwaypointTemplate(point) {
-  const {basePrice, dateTo, dateFrom, destination, isFavorite, offers, type} = point;
+function createTripPointTemplate(point) {
+  const { basePrice, dateTo, dateFrom, destination, isFavorite, offers, type } = point;
   const dateDay = humanizeTravelDay(dateFrom);
   const dateEnd = humanizeTimeFromTo(dateTo);
   const dateStart = humanizeTimeFromTo(dateFrom);
   const travelTime = humanizeTravelTime(dateFrom, dateTo);
+  const pointTypeOffer = offersByType.find((offer) => offer.type === type);
+  const checkedOffers = pointTypeOffer.offers.filter((offer) => offers.includes(offer.id));
 
+  const offersTemplate = () => {
+    if (checkedOffers.length) {
+      const template = checkedOffers.map((offer) => `<li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+      </li>`).join('');
+      return template;
+    }
+    else
+    {
+      return `<li class="event__offer">
+      <span class="event__offer-title">No offers</span>
+      </li>`;
+    }
+  };
 
   const favoritePoint = isFavorite
     ? 'event__favorite-btn--active'
@@ -34,11 +52,7 @@ function createwaypointTemplate(point) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        <li class="event__offer">
-          <span class="event__offer-title">${offers.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offers.price}</span>
-        </li>
+        ${offersTemplate()}
       </ul>
       <button class="event__favorite-btn ${favoritePoint}" type="button">
         <span class="visually-hidden">Add to favorite</span>
@@ -53,14 +67,14 @@ function createwaypointTemplate(point) {
   </li>`);
 }
 
-export default class waypointView {
+export default class PointView {
 
   constructor({point}) {
     this.point = point;
   }
 
   getTemplate() {
-    return createwaypointTemplate(this.point);
+    return createTripPointTemplate(this.point);
   }
 
   getElement() {

@@ -29,7 +29,7 @@ function createSortingTemplate() {
 </form>`);
 }
 
-export default class sortingView {
+export default class SortingView {
   getTemplate() {
     return createSortingTemplate();
   }
