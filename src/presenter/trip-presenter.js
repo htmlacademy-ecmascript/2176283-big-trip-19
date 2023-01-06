@@ -8,26 +8,32 @@ import { render, RenderPosition } from '../render.js';
 
 
 export default class TripPresenter {
-  pageComponent = new PageView();
-  listComponent = new ListView();
+
+  #listContainer = null;
+  #pointsModel = null;
+
+  #pageComponent = new PageView();
+  #listComponent = new ListView();
+
+  #listPoints = [];
 
   constructor({listContainer, pointsModel})
   {
-    this.listContainer = listContainer;
-    this.pointsModel = pointsModel;
+    this.#listContainer = listContainer;
+    this.#pointsModel = pointsModel;
   }
 
   init() {
-    this.listPoints = [...this.pointsModel.getPoints()];
+    this.#listPoints = [...this.#pointsModel.points];
 
-    render(this.pageComponent, this.listContainer);
-    render(new SortingView(), this.pageComponent.getElement());
-    render(new NewPointView(), this.listComponent.getElement(), RenderPosition.AFTERBEGIN);
-    render(new EditPointView(this.listPoints[0]), this.listComponent.getElement(), RenderPosition.AFTERBEGIN);
-    render(this.listComponent, this.pageComponent.getElement());
+    render(this.#pageComponent, this.#listContainer);
+    render(new SortingView(), this.#pageComponent.element);
+    render(new NewPointView(), this.#listComponent.element, RenderPosition.AFTERBEGIN);
+    render(new EditPointView(this.#listPoints[0]), this.#listComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#listComponent, this.#pageComponent.element);
 
-    for (let i = 1; i < this.listPoints.length; i++) {
-      render(new PointView({point: this.listPoints[i]}), this.listComponent.getElement());
+    for (let i = 1; i < this.#listPoints.length; i++) {
+      render(new PointView({point: this.#listPoints[i]}), this.#listComponent.element);
     }
 
   }

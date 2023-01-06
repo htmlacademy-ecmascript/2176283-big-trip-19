@@ -24,7 +24,7 @@ const createEditPointTemplate = (point) => {
       </div>`;
   }).join('');
 
-const destinationPoint = destinations.map((element) =>`<option value="${element.name}"></option>`).join('');
+  const destinationPoint = destinations.map((element) =>`<option value="${element.name}"></option>`).join('');
 
   const iconTypeTemplate = offersByType.map((element) =>
     `<div class="event__type-item">
