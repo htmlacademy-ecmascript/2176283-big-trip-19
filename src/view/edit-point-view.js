@@ -12,7 +12,7 @@ const createEditPointTemplate = (point) => {
   const pointDestination = destinations.find((item) => destination === item.id);
 
   const offersTemplate = pointTypeOffer.offers.map((offer) =>{
-    const checked = point.offers.includes(offer.id) ? 'checked' : '';
+    const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" ${checked} name=${offer.title}>
@@ -103,23 +103,26 @@ const createEditPointTemplate = (point) => {
 
 export default class EditPointView {
 
+  #element = null;
+  #point = null;
+
   constructor(point) {
-    this.point = point;
+    this.#point = point;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point);
+  get template() {
+    return createEditPointTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

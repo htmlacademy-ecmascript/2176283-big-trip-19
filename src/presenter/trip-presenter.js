@@ -29,12 +29,35 @@ export default class TripPresenter {
     render(this.#pageComponent, this.#listContainer);
     render(new SortingView(), this.#pageComponent.element);
     render(new NewPointView(), this.#listComponent.element, RenderPosition.AFTERBEGIN);
-    render(new EditPointView(this.#listPoints[0]), this.#listComponent.element, RenderPosition.AFTERBEGIN);
     render(this.#listComponent, this.#pageComponent.element);
 
-    for (let i = 1; i < this.#listPoints.length; i++) {
-      render(new PointView({point: this.#listPoints[i]}), this.#listComponent.element);
+    for (let i = 0; i < this.#listPoints.length; i++) {
+      this.#renderPoint(this.#listPoints[i]);
     }
 
+  }
+
+  #renderPoint(point) {
+    const pointComponent = new PointView({point});
+    const editPointComponent = new EditPointView(point);
+
+    const replacePointToFormEdit = () => {
+      this.#listComponent.element.replaceChild(editPointComponent.element, pointComponent.element);
+    };
+
+    const replaceFormEditToPoint = () => {
+      this.#listComponent.element.replaceChild(pointComponent.element, editPointComponent.element);
+    };
+
+    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replacePointToFormEdit();
+    });
+
+    editPointComponent.element.querySelector('form').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceFormEditToPoint();
+    });
+
+    render(pointComponent, this.#listComponent.element);
   }
 }

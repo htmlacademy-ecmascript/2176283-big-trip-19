@@ -1,6 +1,6 @@
 import { createElement } from '../render.js';
 import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils.js';
-import { offersByType } from '../mock/points.js';
+import { offersByType, destinations } from '../mock/points.js';
 
 function createTripPointTemplate(point) {
   const { basePrice, dateTo, dateFrom, destination, isFavorite, offers, type } = point;
@@ -10,6 +10,8 @@ function createTripPointTemplate(point) {
   const travelTime = humanizeTravelTime(dateFrom, dateTo);
   const pointTypeOffer = offersByType.find((offer) => offer.type === type);
   const checkedOffers = pointTypeOffer.offers.filter((offer) => offers.includes(offer.id));
+
+  const pointDestination = destinations.find((item) => destination === item.id);
 
   const offersTemplate = () => {
     if (checkedOffers.length) {
@@ -38,7 +40,7 @@ function createTripPointTemplate(point) {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination.name}</h3>
+      <h3 class="event__title">${type} ${pointDestination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${dateStart}</time>
