@@ -49,13 +49,23 @@ export default class TripPresenter {
       this.#listComponent.element.replaceChild(pointComponent.element, editPointComponent.element);
     };
 
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceFormEditToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
     pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
       replacePointToFormEdit();
+      document.addEventListener('keydown', escKeyDownHandler);
     });
 
     editPointComponent.element.querySelector('form').addEventListener('submit', (evt) => {
       evt.preventDefault();
       replaceFormEditToPoint();
+      document.removeEventListener('keydown', escKeyDownHandler);
     });
 
     render(pointComponent, this.#listComponent.element);
