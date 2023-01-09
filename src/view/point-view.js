@@ -1,14 +1,34 @@
-import {createElement} from '../render.js';
-import {humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime} from '../utils.js';
+import { createElement } from '../render.js';
+import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils.js';
+import { offersByType, destinations } from '../mock/points.js';
 
-
-function createwaypointTemplate(point) {
-  const {basePrice, dateTo, dateFrom, destination, isFavorite, offers, type} = point;
+function createTripPointTemplate(point) {
+  const { basePrice, dateTo, dateFrom, destination, isFavorite, offers, type } = point;
   const dateDay = humanizeTravelDay(dateFrom);
   const dateEnd = humanizeTimeFromTo(dateTo);
   const dateStart = humanizeTimeFromTo(dateFrom);
   const travelTime = humanizeTravelTime(dateFrom, dateTo);
+  const pointTypeOffer = offersByType.find((offer) => offer.type === type);
+  const checkedOffers = pointTypeOffer.offers.filter((offer) => offers.includes(offer.id));
 
+  const pointDestination = destinations.find((item) => destination === item.id);
+
+  const offersTemplate = () => {
+    if (checkedOffers.length) {
+      const template = checkedOffers.map((offer) => `<li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+      </li>`).join('');
+      return template;
+    }
+    else
+    {
+      return `<li class="event__offer">
+      <span class="event__offer-title">No offers</span>
+      </li>`;
+    }
+  };
 
   const favoritePoint = isFavorite
     ? 'event__favorite-btn--active'
@@ -20,7 +40,7 @@ function createwaypointTemplate(point) {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination.name}</h3>
+      <h3 class="event__title">${type} ${pointDestination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${dateStart}</time>
@@ -34,11 +54,7 @@ function createwaypointTemplate(point) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        <li class="event__offer">
-          <span class="event__offer-title">${offers.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offers.price}</span>
-        </li>
+        ${offersTemplate()}
       </ul>
       <button class="event__favorite-btn ${favoritePoint}" type="button">
         <span class="visually-hidden">Add to favorite</span>
@@ -53,25 +69,28 @@ function createwaypointTemplate(point) {
   </li>`);
 }
 
-export default class waypointView {
+export default class PointView {
+
+  #element = null;
+  #point = null;
 
   constructor({point}) {
-    this.point = point;
+    this.#point = point;
   }
 
-  getTemplate() {
-    return createwaypointTemplate(this.point);
+  get template() {
+    return createTripPointTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
