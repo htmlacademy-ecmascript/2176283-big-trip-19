@@ -15,7 +15,7 @@ const createEditPointTemplate = (point) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" ${checked} name=${offer.title}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${point.id}" type="checkbox" ${checked} name=${offer.title}>
         <label class="event__offer-label" for="event-offer-luggage-1">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -28,8 +28,8 @@ const createEditPointTemplate = (point) => {
 
   const iconTypeTemplate = offersByType.map((element) =>
     `<div class="event__type-item">
-      <input id="event-${element.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}">
-      <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-1">${element.type}</label>
+      <input id="event-${element.type}-${element.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}">
+      <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-${element.id}">${element.type}</label>
     </div>`
   ).join('');
 
@@ -106,7 +106,7 @@ export default class EditPointView {
   #element = null;
   #point = null;
 
-  constructor(point) {
+  constructor({point}) {
     this.#point = point;
   }
 

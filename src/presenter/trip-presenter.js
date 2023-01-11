@@ -4,6 +4,7 @@ import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
 import NewPointView from '../view/new-point-view.js';
 import EditPointView from '../view/edit-point-view.js';
+import NoPointView from '../view/no-point-veiw.js';
 import { render, RenderPosition } from '../render.js';
 
 
@@ -27,19 +28,16 @@ export default class TripPresenter {
     this.#listPoints = [...this.#pointsModel.points];
 
     render(this.#pageComponent, this.#listContainer);
-    render(new SortingView(), this.#pageComponent.element);
-    render(new NewPointView(), this.#listComponent.element, RenderPosition.AFTERBEGIN);
-    render(this.#listComponent, this.#pageComponent.element);
 
-    for (let i = 0; i < this.#listPoints.length; i++) {
-      this.#renderPoint(this.#listPoints[i]);
-    }
+    //render(new NewPointView(), this.#listComponent.element, RenderPosition.AFTERBEGIN);
+
+    this.#renderListPoints();
 
   }
 
   #renderPoint(point) {
     const pointComponent = new PointView({point});
-    const editPointComponent = new EditPointView(point);
+    const editPointComponent = new EditPointView({point});
 
     const replacePointToFormEdit = () => {
       this.#listComponent.element.replaceChild(editPointComponent.element, pointComponent.element);
@@ -70,4 +68,19 @@ export default class TripPresenter {
 
     render(pointComponent, this.#listComponent.element);
   }
+
+  #renderListPoints() {
+    if(this.#listPoints.every((point) => point.name)) {
+      render(new NoPointView(),this.#pageComponent.element);
+    }
+    else {
+      render(new SortingView(), this.#pageComponent.element);
+      render(this.#listComponent, this.#pageComponent.element);
+
+      for (let i = 0; i < this.#listPoints.length; i++) {
+        this.#renderPoint(this.#listPoints[i]);
+      }
+    }
+  }
+
 }
