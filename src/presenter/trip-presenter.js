@@ -2,10 +2,10 @@ import PointView from '../view/point-view.js';
 import PageView from '../view/page-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
-import NewPointView from '../view/new-point-view.js';
+//import NewPointView from '../view/new-point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import NoPointView from '../view/no-point-veiw.js';
-import { render, RenderPosition } from '../render.js';
+import { render } from '../framework/render.js';
 
 
 export default class TripPresenter {
