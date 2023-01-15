@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils.js';
 import { offersByType, destinations } from '../mock/points.js';
 
@@ -69,12 +69,12 @@ function createTripPointTemplate(point) {
   </li>`);
 }
 
-export default class PointView {
+export default class PointView extends AbstractView {
 
-  #element = null;
   #point = null;
 
   constructor({point}) {
+    super();
     this.#point = point;
   }
 
@@ -82,15 +82,4 @@ export default class PointView {
     return createTripPointTemplate(this.#point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
 }

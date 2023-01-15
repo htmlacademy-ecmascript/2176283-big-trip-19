@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeTimeEdit } from '../utils.js';
 import { offersByType, destinations } from '../mock/points.js';
 
@@ -15,7 +15,7 @@ const createEditPointTemplate = (point) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" ${checked} name=${offer.title}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${point.id}" type="checkbox" ${checked} name=${offer.title}>
         <label class="event__offer-label" for="event-offer-luggage-1">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -28,8 +28,8 @@ const createEditPointTemplate = (point) => {
 
   const iconTypeTemplate = offersByType.map((element) =>
     `<div class="event__type-item">
-      <input id="event-${element.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}">
-      <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-1">${element.type}</label>
+      <input id="event-${element.type}-${element.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}">
+      <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-${element.id}">${element.type}</label>
     </div>`
   ).join('');
 
@@ -101,12 +101,12 @@ const createEditPointTemplate = (point) => {
 </li>`);
 };
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView {
 
-  #element = null;
   #point = null;
 
-  constructor(point) {
+  constructor({point}) {
+    super();
     this.#point = point;
   }
 
@@ -114,15 +114,4 @@ export default class EditPointView {
     return createEditPointTemplate(this.#point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
 }
