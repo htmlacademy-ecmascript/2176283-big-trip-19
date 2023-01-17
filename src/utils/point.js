@@ -20,4 +20,25 @@ function humanizeTravelTime(from, to) {
   return dayjs(to).diff(dayjs(from), 'h');
 }
 
-export { humanizeTimeFromTo, humanizeTravelDay,humanizeTimeEdit, humanizeTravelTime };
+function isPointfuture(dateFrom) {
+  return dayjs(dateFrom).isAfter(dayjs());
+}
+
+function isPointPresentFrom(dateFrom) {
+  return dayjs(dateFrom).isBefore(dayjs()) || dayjs(dateFrom).isSame(dayjs());
+}
+
+function isPointPresentTo(dateTo) {
+  return dayjs(dateTo).isAfter(dayjs()) || dayjs(dateTo).isSame(dayjs());
+}
+
+function isPointPast(dateTo) {
+  return dayjs(dateTo).isBefore(dayjs());
+}
+
+export {
+  humanizeTimeFromTo, humanizeTravelDay,
+  humanizeTimeEdit, humanizeTravelTime,
+  isPointfuture, isPointPresentFrom,
+  isPointPresentTo, isPointPast
+};
