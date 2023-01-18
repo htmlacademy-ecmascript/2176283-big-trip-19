@@ -1,4 +1,4 @@
-import { getRandomArrayElement } from '../mock/utils.js';
+import { getRandomArrayElement } from '../utils/common.js';
 //import {TYPE} from '../const.js';
 
 const destinations = [
@@ -134,8 +134,8 @@ const point = [
   },
   {
     basePrice: 3000,
-    dateFrom: '2021-07-14T21:55:56.845Z',
-    dateTo: '2021-07-15T12:22:13.375Z',
+    dateFrom: '2023-01-16T21:55:56.845Z',
+    dateTo: '2023-01-18T12:22:13.375Z',
     destination: /*getRandomArrayElement(destinations)*/1,
     id: 2,
     isFavorite: false,
@@ -145,8 +145,8 @@ const point = [
   },
   {
     basePrice: 4500,
-    dateFrom: '2021-07-14T22:55:56.845Z',
-    dateTo: '2021-07-15T12:23:13.375Z',
+    dateFrom: '2024-07-14T22:55:56.845Z',
+    dateTo: '2024-07-15T12:23:13.375Z',
     destination: /*getRandomArrayElement(destinations)*/0,
     id: 3,
     isFavorite: true,
