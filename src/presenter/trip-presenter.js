@@ -1,11 +1,9 @@
-import PointView from '../view/point-view.js';
 import PageView from '../view/page-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
-import EditPointView from '../view/edit-point-view.js';
 import NoPointView from '../view/no-point-veiw.js';
-import { render, replace } from '../framework/render.js';
-
+import { render, RenderPosition } from '../framework/render.js';
+import PointPresenter from './point-presenter.js';
 
 export default class TripPresenter {
 
@@ -14,6 +12,8 @@ export default class TripPresenter {
 
   #pageComponent = new PageView();
   #listComponent = new ListView();
+  #sortingComponent = new SortingView();
+  #noPointCompoient = new NoPointView();
 
   #listPoints = [];
 
@@ -32,49 +32,28 @@ export default class TripPresenter {
 
   }
 
+  #renderSort () {
+    render(this.#sortingComponent, this.#pageComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderNoPoints () {
+    render(this.#noPointCompoient, this.#pageComponent.element);
+  }
+
   #renderPoint(point) {
-
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceFormEditToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    const pointComponent = new PointView({
-      point,
-      onEditClick: () => {
-        replacePointToFormEdit.call(this);
-        document.removeEventListener('click', escKeyDownHandler);
-      }
+    const pointPresenter = new PointPresenter({
+      pointContainer: this.#listComponent.element,
     });
-
-    const editPointComponent = new EditPointView({
-      point,
-      onFormSubmit: () => {
-        replaceFormEditToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
-
-    function replacePointToFormEdit() {
-      replace(editPointComponent, pointComponent);
-    }
-
-    function replaceFormEditToPoint() {
-      replace(pointComponent, editPointComponent);
-    }
-
-    render(pointComponent, this.#listComponent.element);
+    pointPresenter.init(point);
   }
 
   #renderListPoints() {
     if(this.#listPoints.every((point) => point.name)) {
-      render(new NoPointView(),this.#pageComponent.element);
+      this.#renderNoPoints();
     }
     else {
-      render(new SortingView(), this.#pageComponent.element);
+      this.#renderSort();
+
       render(this.#listComponent, this.#pageComponent.element);
 
       for (let i = 0; i < this.#listPoints.length; i++) {
