@@ -2,18 +2,26 @@ import PointView from '../view/point-view.js';
 import EditPointView from '../view/edit-point-view.js';
 import { remove, render, replace } from '../framework/render.js';
 
+const Mode = {
+  VIEW: 'VIEW',
+  EDITING: 'EDITING',
+};
+
 export default class PointPresenter {
 
   #pointContainer = null;
   #handleDataChange = null;
+  #handleModeChange = null;
 
   #pointComponent = null;
   #editPointComponent = null;
   #point = null;
+  #mode = Mode.VIEW;
 
-  constructor({pointContainer, onDataChange}) {
+  constructor({pointContainer, onDataChange, onModeChange}) {
     this.#pointContainer = pointContainer;
     this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init(point) {
@@ -38,11 +46,11 @@ export default class PointPresenter {
       return;
     }
 
-    if (this.#pointContainer.contains(prevPointComponent.element)) {
+    if (this.#mode === Mode.VIEW) {
       replace(this.#pointComponent, prevPointComponent);
     }
 
-    if (this.#pointContainer.contains(prevEditPointComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#editPointComponent, prevEditPointComponent);
     }
 
@@ -55,17 +63,24 @@ export default class PointPresenter {
     remove(this.#editPointComponent);
   }
 
+  resetView() {
+    if (this.#mode !== Mode.VIEW) {
+      this.#replaceFormEditToPoint();
+    }
+  }
+
   #replacePointToFormEdit() {
     replace(this.#editPointComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   #replaceFormEditToPoint() {
     replace(this.#pointComponent, this.#editPointComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.VIEW;
   }
-
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -74,12 +89,12 @@ export default class PointPresenter {
     }
   };
 
-
   #handleEditClick = () => {
     this.#replacePointToFormEdit();
   };
 
-  #handleFormSubmit = () => {
+  #handleFormSubmit = (point) => {
+    this.#handleDataChange(point);
     this.#replaceFormEditToPoint();
   };
 
