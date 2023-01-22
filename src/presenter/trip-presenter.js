@@ -4,6 +4,7 @@ import ListView from '../view/list-view.js';
 import NoPointView from '../view/no-point-veiw.js';
 import { render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
+import { updateItem } from '../utils/common.js';
 
 export default class TripPresenter {
 
@@ -16,6 +17,8 @@ export default class TripPresenter {
   #noPointCompoient = new NoPointView();
 
   #listPoints = [];
+
+  #pointPresenter = new Map();
 
   constructor({listContainer, pointsModel})
   {
@@ -32,6 +35,11 @@ export default class TripPresenter {
 
   }
 
+  #handlePointChange = (updatedPoint) => {
+    this.#listPoints = updateItem(this.#listPoints, updatedPoint);
+    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
+  };
+
   #renderSort () {
     render(this.#sortingComponent, this.#pageComponent.element, RenderPosition.AFTERBEGIN);
   }
@@ -43,8 +51,15 @@ export default class TripPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointContainer: this.#listComponent.element,
+      onDataChange: this.#handlePointChange,
     });
     pointPresenter.init(point);
+    this.#pointPresenter.set(point.id, pointPresenter);
+  }
+
+  #clearPointList() {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
   }
 
   #renderListPoints() {
