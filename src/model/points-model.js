@@ -1,11 +1,18 @@
-import { getRandomPoint } from '../mock/points.js';
-
-const NUMBER_OF_WAYPOINTS = 5;
+import { generateFilter } from '../mock/filter.js';
 
 export default class PointsModel {
-  #points = Array.from({length: NUMBER_OF_WAYPOINTS}, getRandomPoint);
+  #points = null;
+
+  constructor(points) {
+    this.#points = points;
+  }
 
   get points() {
     return this.#points;
   }
+
+  get filters(){
+    return generateFilter(this.#points);
+  }
+
 }

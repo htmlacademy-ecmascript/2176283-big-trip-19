@@ -1,5 +1,5 @@
 import { getRandomArrayElement } from '../utils/common.js';
-//import {TYPE} from '../const.js';
+import { nanoid } from 'nanoid';
 
 const destinations = [
   {
@@ -114,50 +114,44 @@ const point = [
     basePrice: 1100,
     dateFrom: '2019-07-10T19:55:56.845Z',
     dateTo: '2019-07-11T09:20:13.375Z',
-    destination: /*getRandomArrayElement(destinations)*/2,
-    id: 0,
+    destination: 2,
     isFavorite: false,
     offers: [0, 1, 4],
-    //type: getRandomArrayElement(TYPE)
     type: 'taxi'
   },
   {
     basePrice: 2000,
     dateFrom: '2020-07-12T20:50:56.845Z',
     dateTo: '2020-07-13T11:21:13.375Z',
-    destination: /*getRandomArrayElement(destinations)*/0,
-    id: 1,
+    destination: 0,
     isFavorite: true,
-    offers: /*getRandomArrayElement(offers)*/[1, 3, 4, 5, 6],
-    //type: getRandomArrayElement(TYPE)
+    offers: [1, 3, 4, 5, 6],
     type: 'bus',
   },
   {
     basePrice: 3000,
     dateFrom: '2023-01-16T21:55:56.845Z',
     dateTo: '2023-01-18T12:22:13.375Z',
-    destination: /*getRandomArrayElement(destinations)*/1,
-    id: 2,
+    destination: 1,
     isFavorite: false,
-    offers:/* getRandomArrayElement(offers)*/[3, 4, 6],
-    //type: getRandomArrayElement(TYPE)
+    offers:[3, 4, 6],
     type: 'train'
   },
   {
     basePrice: 4500,
     dateFrom: '2024-07-14T22:55:56.845Z',
     dateTo: '2024-07-15T12:23:13.375Z',
-    destination: /*getRandomArrayElement(destinations)*/0,
-    id: 3,
+    destination: 0,
     isFavorite: true,
-    offers: /*getRandomArrayElement(offers)*/[3, 4, 6],
-    //type: getRandomArrayElement(TYPE)
+    offers: [3, 4, 6],
     type: 'ship'
   },
 ];
 
 function getRandomPoint() {
-  return getRandomArrayElement(point);
+  return {
+    id: nanoid(),
+    ...getRandomArrayElement(point)};
 }
 
 export { getRandomPoint, offersByType, destinations };
