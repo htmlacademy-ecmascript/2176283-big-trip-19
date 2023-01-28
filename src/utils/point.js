@@ -36,9 +36,20 @@ function isPointPast(dateTo) {
   return dayjs(dateTo).isBefore(dayjs());
 }
 
+function sortTimeDown(pointA, pointB) {
+  const spendTimeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const spendTimeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  return spendTimeB - spendTimeA;
+
+}
+
+function sortPriceDown(pointA, pointB) {
+  return pointB.basePrice - pointA.basePrice;
+}
+
 export {
   humanizeTimeFromTo, humanizeTravelDay,
   humanizeTimeEdit, humanizeTravelTime,
   isPointfuture, isPointPresentFrom,
-  isPointPresentTo, isPointPast
+  isPointPresentTo, isPointPast, sortPriceDown, sortTimeDown
 };

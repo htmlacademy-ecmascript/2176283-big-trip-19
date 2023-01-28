@@ -1,10 +1,11 @@
+import { SortType } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createSortingTemplate() {
   return (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   <div class="trip-sort__item  trip-sort__item--day">
     <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
-    <label class="trip-sort__btn" for="sort-day">Day</label>
+    <label class="trip-sort__btn" for="sort-day" data-sort-type="${SortType.DAY}">Day</label>
   </div>
 
   <div class="trip-sort__item  trip-sort__item--event">
@@ -14,12 +15,12 @@ function createSortingTemplate() {
 
   <div class="trip-sort__item  trip-sort__item--time">
     <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
-    <label class="trip-sort__btn" for="sort-time">Time</label>
+    <label class="trip-sort__btn" for="sort-time" data-sort-type="${SortType.TIME}">Time</label>
   </div>
 
   <div class="trip-sort__item  trip-sort__item--price">
     <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
-    <label class="trip-sort__btn" for="sort-price">Price</label>
+    <label class="trip-sort__btn" for="sort-price" data-sort-type="${SortType.PRICE}">Price</label>
   </div>
 
   <div class="trip-sort__item  trip-sort__item--offer">
@@ -31,8 +32,33 @@ function createSortingTemplate() {
 
 export default class SortingView extends AbstractView {
 
+  #handleSortingTypeChange = null;
+  //onSortingTypeChange - обработчик(когда изменился сам обработчик)
+  constructor ({onSortingTypeChange}) {
+    super();
+    this.#handleSortingTypeChange = onSortingTypeChange;
+    //подписка на событие клик и вызывается обработчик
+    document.addEventListener('click', this.#sortingTypeChangeHandler);
+  }
+
   get template() {
     return createSortingTemplate();
   }
+
+  #sortingTypeChangeHandler = (evt) => {
+    //проверка на клик по нужному тегу
+    //evt.target - обращаемся к элементу на котором произошло событие
+    //tagName - свойство
+    if(evt.target.tagName !== 'LABEL') {
+      return;
+    }
+    //отменяем дейсвие по умолчанию
+    evt.preventDefault();
+    //обработчик, которому передаем тип сортировки
+    //evt.target - обращаемся к элементу на котором произошло событие
+    //dataset - свойство, через которое получаем значение любого дата атрибута
+    //SortType - атрибут, к которому обращаемся в разметку
+    this.#handleSortingTypeChange(evt.target.dataset.sortType);
+  };
 
 }
