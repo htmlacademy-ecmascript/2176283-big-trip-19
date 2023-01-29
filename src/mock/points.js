@@ -1,4 +1,4 @@
-import { getRandomArrayElement } from '../utils/common.js';
+import { getRandomArrayElement } from '../mock/utils.js';
 import { nanoid } from 'nanoid';
 
 const destinations = [
@@ -109,7 +109,7 @@ const offersByType = [
   }
 ];
 
-const point = [
+const points = [
   {
     basePrice: 1100,
     dateFrom: '2019-07-10T19:55:56.845Z',
@@ -151,7 +151,7 @@ const point = [
 function getRandomPoint() {
   return {
     id: nanoid(),
-    ...getRandomArrayElement(point)};
+    ...getRandomArrayElement(points)};
 }
 
 export { getRandomPoint, offersByType, destinations };
