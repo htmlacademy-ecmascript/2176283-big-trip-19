@@ -34,7 +34,7 @@ export default class TripPresenter {
   init() {
     this.#listPoints = [...this.#pointsModel.points];
     // Сохраняем исходный массив:
-    this.#sourcedListPoints = [...this.#pointsModel.points];
+    //this.#sourcedListPoints = [...this.#pointsModel.points];
 
     render(this.#pageComponent, this.#listContainer);
 
@@ -48,7 +48,7 @@ export default class TripPresenter {
   #handlePointChange = (updatedPoint) => {
     this.#listPoints = updateItem(this.#listPoints, updatedPoint);
     //При обновлении задачи делаем копию в sourcedListPoint на случай при необходимости возвращения к изначальному виду
-    this.#sourcedListPoints = updateItem(this.#sourcedListPoints, updatedPoint);
+    //this.#sourcedListPoints = updateItem(this.#sourcedListPoints, updatedPoint);
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
   };
 
@@ -65,7 +65,7 @@ export default class TripPresenter {
         break;
       default:
         // При возврате в исходное состояниемы просто запишем в  #listPoints исходный массив
-        this.#listPoints = [...this.#sourcedListPoints];
+        this.#listPoints = [...this.#pointsModel.points];
     }
     this.#currentSortingType = sortType;
   }

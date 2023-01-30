@@ -73,7 +73,7 @@ const offers = [
 const offersByType = [
   {
     type: 'taxi',
-    offers: offers.filter((offer) => offer.id === 0 || offer.id === 1 || offer.id === 4)
+    offers: []
   },
   {
     type: 'bus',
@@ -116,7 +116,7 @@ const points = [
     dateTo: '2019-07-11T09:20:13.375Z',
     destination: 2,
     isFavorite: false,
-    offers: [0, 1, 4],
+    offers: [],
     type: 'taxi'
   },
   {

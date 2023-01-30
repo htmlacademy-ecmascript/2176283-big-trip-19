@@ -1,7 +1,20 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTimeEdit } from '../utils/point.js';
 import { offersByType, destinations } from '../mock/points.js';
+import dayjs from 'dayjs';
 
+const START_DATE = dayjs().toISOString();
+const END_DATE = dayjs().add((3),'day').toISOString();
+
+const BLANK_POINT = {
+  basePrice: 0,
+  dateFrom: START_DATE,
+  dateTo: END_DATE,
+  destination: 0,
+  id: 0,
+  offers: [],
+  type: 'taxi'
+};
 
 const createEditPointTemplate = (point) => {
   const { basePrice, dateTo, dateFrom, offers, destination, type } = point;
@@ -101,28 +114,49 @@ const createEditPointTemplate = (point) => {
 </li>`);
 };
 
-export default class EditPointView extends AbstractView {
+export default class EditPointView extends AbstractStatefulView {
 
-  #point = null;
   #handleFormSubmit = null;
+  #handleRollupBtnClick = null;
 
-  constructor({point, onFormSubmit}) {
+  constructor({point = BLANK_POINT, onFormSubmit, onRollupBtnClick}) {
     super();
-    this.#point = point;
+    this._setState(EditPointView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
+    this.#handleRollupBtnClick = onRollupBtnClick;
 
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
 
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupBtnClickHandler);
+
   }
 
   get template() {
-    return createEditPointTemplate(this.#point);
+    return createEditPointTemplate(this._state);
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
 
+  #rollupBtnClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollupBtnClick();
+  };
+
+
+  static parsePointToState(point) {
+    return {...point,
+      isOffers: point.offers !== null,
+    };
+  }
+
+  static parseStateToPoint(state) {
+    const point = {...state};
+
+    return point;
+  }
 }
