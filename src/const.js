@@ -9,8 +9,8 @@ const FilterType = {
 
 const SortType = {
   DAY: 'day',
-  TIME:'time',
-  PRICE:'price',
+  TIME: 'time',
+  PRICE: 'price',
 };
 
 export { TYPE, FilterType, SortType };

@@ -46,6 +46,19 @@ const createEditPointTemplate = (point) => {
     </div>`
   ).join('');
 
+
+  const picturesTemplate = () => {
+    if(pointDestination.pictures.length) {
+      const template = pointDestination.pictures.map((element) =>`
+            <img class="event__photo" src="${element.src}" alt="${element.description}">`).join('');
+      return template;
+    }
+    else
+    {
+      return '';
+    }
+  };
+
   return (`<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -108,6 +121,11 @@ const createEditPointTemplate = (point) => {
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${pointDestination.description}</p>
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${picturesTemplate()}
+          </div>
+        </div>
       </section>
     </section>
   </form>
@@ -125,16 +143,25 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleFormSubmit = onFormSubmit;
     this.#handleRollupBtnClick = onRollupBtnClick;
 
+    this._restoreHandlers();
+  }
+
+  get template() {
+    return createEditPointTemplate(this._state);
+  }
+
+  _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
 
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#rollupBtnClickHandler);
 
-  }
+    this.element.querySelector('.event__type-group')
+      .addEventListener('change', this.#typeLabelHandler);
 
-  get template() {
-    return createEditPointTemplate(this._state);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#inputDestinacionHandler);
   }
 
   #formSubmitHandler = (evt) => {
@@ -147,6 +174,18 @@ export default class EditPointView extends AbstractStatefulView {
     this.#handleRollupBtnClick();
   };
 
+  #typeLabelHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      this.updateElement({
+        type: evt.target.value,
+      });
+    }
+  };
+
+  #inputDestinacionHandler = (evt) => {
+    evt.preventDefault();
+  };
 
   static parsePointToState(point) {
     return {...point,

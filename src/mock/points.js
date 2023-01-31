@@ -10,6 +10,10 @@ const destinations = [
       {
         src: `https://loremflickr.com/248/152?random=${Math.random()}`,
         description: 'Chamonix parliament building'
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${Math.random()}`,
+        description: 'Chamonix parliament building'
       }
     ]
   },
@@ -28,12 +32,12 @@ const destinations = [
     id: 2,
     description: 'San Francisco is the fourth most populous in California and 17th most populous in the United States.',
     name: 'San Francisco',
-    pictures: [
+    pictures: [/*
       {
         src: `https://loremflickr.com/248/152?random=${Math.random()}`,
         description: 'Local views of San Francisco'
       }
-    ]
+    */]
   }
 ];
 
