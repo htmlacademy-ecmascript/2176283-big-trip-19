@@ -1,7 +1,20 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTimeEdit } from '../utils/point.js';
 import { offersByType, destinations } from '../mock/points.js';
+import dayjs from 'dayjs';
 
+const START_DATE = dayjs().toISOString();
+const END_DATE = dayjs().add((3),'day').toISOString();
+
+const BLANK_POINT = {
+  basePrice: 0,
+  dateFrom: START_DATE,
+  dateTo: END_DATE,
+  destination: 0,
+  id: 0,
+  offers: [],
+  type: 'taxi'
+};
 
 const createEditPointTemplate = (point) => {
   const { basePrice, dateTo, dateFrom, offers, destination, type } = point;
@@ -32,6 +45,19 @@ const createEditPointTemplate = (point) => {
       <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-${element.id}">${element.type}</label>
     </div>`
   ).join('');
+
+
+  const picturesTemplate = () => {
+    if(pointDestination.pictures.length) {
+      const template = pointDestination.pictures.map((element) =>`
+            <img class="event__photo" src="${element.src}" alt="${element.description}">`).join('');
+      return template;
+    }
+    else
+    {
+      return '';
+    }
+  };
 
   return (`<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -92,37 +118,93 @@ const createEditPointTemplate = (point) => {
         </div>
       </section>
 
-      <section class="event__section  event__section--destination">
+      ${pointDestination ? `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${pointDestination.description}</p>
+        <p class="event__destination-description">${pointDestination.description}</p>` : ''}
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${picturesTemplate()}
+          </div>
+        </div>
       </section>
     </section>
   </form>
 </li>`);
 };
 
-export default class EditPointView extends AbstractView {
+export default class EditPointView extends AbstractStatefulView {
 
-  #point = null;
   #handleFormSubmit = null;
+  #handleRollupBtnClick = null;
 
-  constructor({point, onFormSubmit}) {
+  constructor({point = BLANK_POINT, onFormSubmit, onRollupBtnClick}) {
     super();
-    this.#point = point;
+    this._setState(EditPointView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
+    this.#handleRollupBtnClick = onRollupBtnClick;
 
-    this.element.querySelector('form')
-      .addEventListener('submit', this.#formSubmitHandler);
-
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEditPointTemplate(this.#point);
+    return createEditPointTemplate(this._state);
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupBtnClickHandler);
+
+    this.element.querySelector('.event__type-group')
+      .addEventListener('change', this.#typeLabelHandler);
+
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#inputDestinacionHandler);
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(EditPointView.parseStateToPoint(this._state));
   };
 
+  #rollupBtnClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollupBtnClick();
+  };
+
+  #typeLabelHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      this.updateElement({
+        type: evt.target.value,
+      });
+    }
+  };
+
+  #inputDestinacionHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      const newDestinationName = evt.target.value;
+      const newDestination = destinations.find(({ name }) => name === newDestinationName);
+
+      this.updateElement({
+        destination: newDestination.id,
+        activeDestination: newDestination
+      });
+    }
+  };
+
+  static parsePointToState(point) {
+    return {...point,
+      isOffers: point.offers !== null,
+    };
+  }
+
+  static parseStateToPoint(state) {
+    const point = {...state};
+
+    return point;
+  }
 }

@@ -38,7 +38,8 @@ export default class PointPresenter {
 
     this.#editPointComponent = new EditPointView({
       point: this.#point,
-      onFormSubmit: this.#handleFormSubmit
+      onFormSubmit: this.#handleFormSubmit,
+      onRollupBtnClick: this.#handleRollupBtnClick,
     });
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
@@ -95,6 +96,10 @@ export default class PointPresenter {
 
   #handleFormSubmit = (point) => {
     this.#handleDataChange(point);
+    this.#replaceFormEditToPoint();
+  };
+
+  #handleRollupBtnClick = () => {
     this.#replaceFormEditToPoint();
   };
 

@@ -53,7 +53,7 @@ export default class SortingView extends AbstractView {
       return;
     }
     //отменяем дейсвие по умолчанию
-    evt.preventDefault();
+    //evt.preventDefault();
     //обработчик, которому передаем тип сортировки
     //evt.target - обращаемся к элементу на котором произошло событие
     //dataset - свойство, через которое получаем значение любого дата атрибута
