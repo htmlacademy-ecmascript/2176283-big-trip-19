@@ -118,9 +118,9 @@ const createEditPointTemplate = (point) => {
         </div>
       </section>
 
-      <section class="event__section  event__section--destination">
+      ${pointDestination ? `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${pointDestination.description}</p>
+        <p class="event__destination-description">${pointDestination.description}</p>` : ''}
         <div class="event__photos-container">
           <div class="event__photos-tape">
             ${picturesTemplate()}
@@ -185,6 +185,15 @@ export default class EditPointView extends AbstractStatefulView {
 
   #inputDestinacionHandler = (evt) => {
     evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      const newDestinationName = evt.target.value;
+      const newDestination = destinations.find(({ name }) => name === newDestinationName);
+
+      this.updateElement({
+        destination: newDestination.id,
+        activeDestination: newDestination
+      });
+    }
   };
 
   static parsePointToState(point) {
