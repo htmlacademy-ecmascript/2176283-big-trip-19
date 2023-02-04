@@ -2,6 +2,9 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTimeEdit } from '../utils/point.js';
 import { offersByType, destinations } from '../mock/points.js';
 import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const START_DATE = dayjs().toISOString();
 const END_DATE = dayjs().add((3),'day').toISOString();
@@ -136,6 +139,8 @@ export default class EditPointView extends AbstractStatefulView {
 
   #handleFormSubmit = null;
   #handleRollupBtnClick = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor({point = BLANK_POINT, onFormSubmit, onRollupBtnClick}) {
     super();
@@ -148,6 +153,23 @@ export default class EditPointView extends AbstractStatefulView {
 
   get template() {
     return createEditPointTemplate(this._state);
+  }
+
+  // Перегружаем метод родителя removeElement,
+  // чтобы при удалении удалялся более не нужный календарь
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
   }
 
   reset(point) {
@@ -168,6 +190,11 @@ export default class EditPointView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#inputDestinacionHandler);
+
+    this.#setDatepickerFrom();
+
+    this.#setDatepickerTo();
+
   }
 
   #formSubmitHandler = (evt) => {
@@ -189,6 +216,18 @@ export default class EditPointView extends AbstractStatefulView {
     }
   };
 
+  #dueDateStartChangeHandler = ([userDate]) => {
+    this._setState({
+      dateFrom: userDate,
+    });
+  };
+
+  #dueDateEndChangeHandler = ([userDate]) => {
+    this._setState({
+      dateTo: userDate,
+    });
+  };
+
   #inputDestinacionHandler = (evt) => {
     evt.preventDefault();
     if (evt.target.tagName === 'INPUT') {
@@ -201,6 +240,32 @@ export default class EditPointView extends AbstractStatefulView {
       });
     }
   };
+
+  #setDatepickerFrom() {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        time_24hr: true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dueDateStartChangeHandler,
+      },
+    );
+  }
+
+  #setDatepickerTo() {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        time_24hr: true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dueDateEndChangeHandler,
+      },
+    );
+  }
 
   static parsePointToState(point) {
     return {...point,

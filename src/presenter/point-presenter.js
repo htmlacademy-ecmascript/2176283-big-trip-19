@@ -67,7 +67,6 @@ export default class PointPresenter {
   resetView() {
     if (this.#mode !== Mode.VIEW) {
       this.#replaceFormEditToPoint();
-      this.#editPointComponent.reset(this.#point);
     }
   }
 
@@ -102,6 +101,7 @@ export default class PointPresenter {
   };
 
   #handleRollupBtnClick = () => {
+    this.#editPointComponent.reset(this.#point);
     this.#replaceFormEditToPoint();
   };
 
