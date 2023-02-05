@@ -6,8 +6,9 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
+const addDays = 3;
 const START_DATE = dayjs().toISOString();
-const END_DATE = dayjs().add((3),'day').toISOString();
+const END_DATE = dayjs().add((addDays),'day').toISOString();
 
 const BLANK_POINT = {
   basePrice: 0,
