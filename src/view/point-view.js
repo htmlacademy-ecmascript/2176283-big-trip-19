@@ -22,8 +22,7 @@ function createTripPointTemplate(point) {
       </li>`).join('');
       return template;
     }
-    else
-    {
+    else {
       return `<li class="event__offer">
       <span class="event__offer-title">No offers</span>
       </li>`;
@@ -75,7 +74,7 @@ export default class PointView extends AbstractView {
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({point, onEditClick, onFavoriteClick}) {
+  constructor({ point, onEditClick, onFavoriteClick }) {
     super();
     this.#point = point;
     this.#handleEditClick = onEditClick;

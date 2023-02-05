@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 
 const DATE_FORMAT = 'MMM DD';
-const TIME_FORMAT = 'hh:mm';
-const EDIT_DATE_FORMAT = 'DD/MM/YY hh:mm';
+const TIME_FORMAT = 'HH:mm';
+const EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
 
 function humanizeTravelDay(dateFrom) {
   return dateFrom ? dayjs(dateFrom).format(DATE_FORMAT) : '';
