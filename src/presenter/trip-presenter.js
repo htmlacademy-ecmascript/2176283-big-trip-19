@@ -2,7 +2,7 @@ import PageView from '../view/page-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
 import NoPointView from '../view/no-point-veiw.js';
-import { render, RenderPosition } from '../framework/render.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
@@ -32,16 +32,16 @@ export default class TripPresenter {
   get points() {
     switch(this.#currentSortingType) {
       case SortType.PRICE:
-        return [...this.#pointsModel].sort(sortPriceDown);
+        return [...this.#pointsModel.points].sort(sortPriceDown);
       case SortType.TIME:
-        return [this.#pointsModel].sort(sortTimeDown);
+        return [this.#pointsModel.points].sort(sortTimeDown);
     }
     return this.#pointsModel.points;
   }
 
   init() {
     render(this.#pageComponent, this.#listContainer);
-    this.#renderListPoints();
+    this.#renderList();
   }
 
   #handleModelChange = () => {
@@ -49,6 +49,7 @@ export default class TripPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
+    //eslint-disable-next-line
     console.log(actionType, updateType, update);
     // Вызываем обновление модели.
     // actionType - действие пользователя чтобы понять какой метод модели вызвать
@@ -68,6 +69,7 @@ export default class TripPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
+    //eslint-disable-next-line
     console.log(updateType, data);
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
@@ -77,9 +79,13 @@ export default class TripPresenter {
         break;
       case UpdateType.MINOR:
         // - обновить список
+        this.#clearList();
+        this.#renderList();
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
+        this.#clearList({resertSortingType: true});
+        this.#renderList();
         break;
     }
   };
@@ -93,14 +99,15 @@ export default class TripPresenter {
     //сортировка компонентов
     this.#currentSortingType = sortType;
     //очищаем список
-    this.#clearPointList();
+    this.#clearList();
     //отрисовка компонентов заново
-    this.#renderPointList();
+    this.#renderList();
   };
 
   #renderSort () {
     this.#sortingComponent = new SortingView(
       {
+        currentSortingType: this.#currentSortingType,
         onSortingTypeChange: this.#handleSortingTypeChange
       }
     );
@@ -127,27 +134,29 @@ export default class TripPresenter {
     points.forEach((point) => this.#renderPoint(point));
   }
 
-  #clearPointList() {
+  #clearList({ resertSortingType = false } = {}) {
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
+
+    remove(this.#sortingComponent);
+    remove(this.#noPointCompoient);
+    if (resertSortingType) {
+      this.#currentSortingType = SortType.DAY;
+    }
   }
 
-  #renderPointList() {
+  #renderList() {
+    render(this.#pageComponent, this.#listContainer);
     const pointCount = this.points.length;
     const points = this.points.slice(0, pointCount);
-    render(this.#listComponent, this.#pageComponent.element);
-    this.#renderPoints(points);
-  }
-
-  #renderListPoints() {
-    render(this.#pageComponent, this.#listContainer);
-    if(this.points.every((point) => point.name))
-    {
+    if (pointCount === 0) {
       this.#renderNoPoints();
     }
-    else {
-      this.#renderSort();
-      this.#renderPointList();
-    }
+
+    this.#renderSort();
+    render(this.#listComponent, this.#pageComponent.element);
+
+
+    this.#renderPoints(points);
   }
 }

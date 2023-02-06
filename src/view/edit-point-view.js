@@ -248,6 +248,7 @@ export default class EditPointView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        //eslint-disable-next-line
         time_24hr: true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dueDateStartChangeHandler,
@@ -261,6 +262,7 @@ export default class EditPointView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        //eslint-disable-next-line
         time_24hr: true,
         defaultDate: this._state.dateTo,
         onChange: this.#dueDateEndChangeHandler,
