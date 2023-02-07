@@ -6,11 +6,13 @@ import { remove, render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
+import { filter } from '../utils/filter.js';
 
 export default class TripPresenter {
 
   #listContainer = null;
   #pointsModel = null;
+  #filterModel = null;
 
   #pageComponent = new PageView();
   #listComponent = new ListView();
@@ -21,22 +23,28 @@ export default class TripPresenter {
   //Исходный выбранный вариант сортировки
   #currentSortingType = SortType.DAY;
 
-  constructor({listContainer, pointsModel})
+  constructor({listContainer, pointsModel, filterModel})
   {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
+    const filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[filterType](points);
+
     switch(this.#currentSortingType) {
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortPriceDown);
+        return filteredPoints.sort(sortPriceDown);
       case SortType.TIME:
-        return [this.#pointsModel.points].sort(sortTimeDown);
+        return filteredPoints.sort(sortTimeDown);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
   init() {
@@ -49,8 +57,6 @@ export default class TripPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
-    //eslint-disable-next-line
-    console.log(actionType, updateType, update);
     // Вызываем обновление модели.
     // actionType - действие пользователя чтобы понять какой метод модели вызвать
     // updateType - тип изменений чтобы понять что после действия нужно обновить
@@ -69,8 +75,6 @@ export default class TripPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    //eslint-disable-next-line
-    console.log(updateType, data);
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:
