@@ -4,11 +4,12 @@ export default class PointsModel extends Observable {
   #pointsApiService = null;
   #points = null;
 
-  constructor({pointsApiService}, points ) {
+  constructor({pointsApiService}, points1) {
     super();
-    this.#points = points;
+    this.#points = points1;
     this.#pointsApiService = pointsApiService;
     this.#pointsApiService.points.then((points) => {
+    //eslint-disable-next-line
       console.log(points);
     });
   }
