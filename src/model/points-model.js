@@ -1,12 +1,17 @@
 import Observable from '../framework/observable.js';
-import { generateFilter } from '../mock/filter.js';
 
 export default class PointsModel extends Observable {
+  #pointsApiService = null;
   #points = null;
 
-  constructor(points) {
+  constructor({pointsApiService}, points1) {
     super();
-    this.#points = points;
+    this.#points = points1;
+    this.#pointsApiService = pointsApiService;
+    this.#pointsApiService.points.then((points) => {
+    //eslint-disable-next-line
+      console.log(points);
+    });
   }
 
   get points() {
@@ -51,10 +56,6 @@ export default class PointsModel extends Observable {
     ];
 
     this._notify(updateType);
-  }
-
-  get filters(){
-    return generateFilter(this.#points);
   }
 
 }

@@ -1,28 +1,40 @@
-import FilterView from './view/filter-view.js';
 import TripPresenter from './presenter/trip-presenter.js';
-import { render } from './framework/render.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 import PointsModel from './model/points-model.js';
+import FilterModel from './model/filter-model.js';
 import { getRandomPoint } from './mock/points.js';
+import PointsApiService from './points-api-service.js';
+
+const AUTHORIZATION = 'Basic er883jdzbdw';
+const END_TASK = 'https://19.ecmascript.pages.academy/big-trip/';
 
 const NUMBER_OF_WAYPOINTS = 5;
 const mockPoints = Array.from({length: NUMBER_OF_WAYPOINTS}, getRandomPoint);
 
 const tripListFilterElement = document.querySelector('.trip-controls__filters');
 const tripListElement = document.querySelector('.trip-events');
+const filterModel = new FilterModel();
 
 const pointsModel = new PointsModel(
-  mockPoints
+  {pointsApiService: new PointsApiService(END_TASK, AUTHORIZATION)
+  },
+  mockPoints,
+  filterModel,
 );
 
 const tripPresenter = new TripPresenter(
   {
     listContainer: tripListElement,
     pointsModel,
+    filterModel,
   }
 );
 
-const filters = pointsModel.filters;
+const filterPresenter = new FilterPresenter({
+  filterContainer: tripListFilterElement,
+  filterModel,
+  pointsModel
+});
 
-render(new FilterView({filters}), tripListFilterElement);
-
+filterPresenter.init();
 tripPresenter.init();

@@ -2,15 +2,17 @@ import PageView from '../view/page-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
 import NoPointView from '../view/no-point-veiw.js';
-import { render, RenderPosition } from '../framework/render.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
+import { filter } from '../utils/filter.js';
 
 export default class TripPresenter {
 
   #listContainer = null;
   #pointsModel = null;
+  #filterModel = null;
 
   #pageComponent = new PageView();
   #listComponent = new ListView();
@@ -21,27 +23,33 @@ export default class TripPresenter {
   //Исходный выбранный вариант сортировки
   #currentSortingType = SortType.DAY;
 
-  constructor({listContainer, pointsModel})
+  constructor({listContainer, pointsModel, filterModel})
   {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
+    const filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[filterType](points);
+
     switch(this.#currentSortingType) {
       case SortType.PRICE:
-        return [...this.#pointsModel].sort(sortPriceDown);
+        return filteredPoints.sort(sortPriceDown);
       case SortType.TIME:
-        return [this.#pointsModel].sort(sortTimeDown);
+        return filteredPoints.sort(sortTimeDown);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
   init() {
     render(this.#pageComponent, this.#listContainer);
-    this.#renderListPoints();
+    this.#renderList();
   }
 
   #handleModelChange = () => {
@@ -49,7 +57,6 @@ export default class TripPresenter {
   };
 
   #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
     // Вызываем обновление модели.
     // actionType - действие пользователя чтобы понять какой метод модели вызвать
     // updateType - тип изменений чтобы понять что после действия нужно обновить
@@ -68,7 +75,6 @@ export default class TripPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:
@@ -77,9 +83,13 @@ export default class TripPresenter {
         break;
       case UpdateType.MINOR:
         // - обновить список
+        this.#clearList();
+        this.#renderList();
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
+        this.#clearList({resertSortingType: true});
+        this.#renderList();
         break;
     }
   };
@@ -93,14 +103,15 @@ export default class TripPresenter {
     //сортировка компонентов
     this.#currentSortingType = sortType;
     //очищаем список
-    this.#clearPointList();
+    this.#clearList();
     //отрисовка компонентов заново
-    this.#renderPointList();
+    this.#renderList();
   };
 
   #renderSort () {
     this.#sortingComponent = new SortingView(
       {
+        currentSortingType: this.#currentSortingType,
         onSortingTypeChange: this.#handleSortingTypeChange
       }
     );
@@ -127,27 +138,29 @@ export default class TripPresenter {
     points.forEach((point) => this.#renderPoint(point));
   }
 
-  #clearPointList() {
+  #clearList({ resertSortingType = false } = {}) {
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
+
+    remove(this.#sortingComponent);
+    remove(this.#noPointCompoient);
+    if (resertSortingType) {
+      this.#currentSortingType = SortType.DAY;
+    }
   }
 
-  #renderPointList() {
+  #renderList() {
+    render(this.#pageComponent, this.#listContainer);
     const pointCount = this.points.length;
     const points = this.points.slice(0, pointCount);
-    render(this.#listComponent, this.#pageComponent.element);
-    this.#renderPoints(points);
-  }
-
-  #renderListPoints() {
-    render(this.#pageComponent, this.#listContainer);
-    if(this.points.every((point) => point.name))
-    {
+    if (pointCount === 0) {
       this.#renderNoPoints();
     }
-    else {
-      this.#renderSort();
-      this.#renderPointList();
-    }
+
+    this.#renderSort();
+    render(this.#listComponent, this.#pageComponent.element);
+
+
+    this.#renderPoints(points);
   }
 }

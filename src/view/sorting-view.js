@@ -1,10 +1,10 @@
 import { SortType } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createSortingTemplate() {
+function createSortingTemplate(currentSortingType) {
   return (`<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   <div class="trip-sort__item  trip-sort__item--day">
-    <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
+    <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" ${currentSortingType === SortType.DAY ? 'checked' : ''}>
     <label class="trip-sort__btn" for="sort-day" data-sort-type="${SortType.DAY}">Day</label>
   </div>
 
@@ -14,12 +14,12 @@ function createSortingTemplate() {
   </div>
 
   <div class="trip-sort__item  trip-sort__item--time">
-    <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
+    <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time" ${currentSortingType === SortType.TIME ? 'checked' : ''}>
     <label class="trip-sort__btn" for="sort-time" data-sort-type="${SortType.TIME}">Time</label>
   </div>
 
   <div class="trip-sort__item  trip-sort__item--price">
-    <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+    <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" ${currentSortingType === SortType.PRICE ? 'checked' : ''}>
     <label class="trip-sort__btn" for="sort-price" data-sort-type="${SortType.PRICE}">Price</label>
   </div>
 
@@ -31,18 +31,19 @@ function createSortingTemplate() {
 }
 
 export default class SortingView extends AbstractView {
-
+  #currentSortingType = null;
   #handleSortingTypeChange = null;
   //onSortingTypeChange - обработчик(когда изменился сам обработчик)
-  constructor ({onSortingTypeChange}) {
+  constructor ({ currentSortingType, onSortingTypeChange }) {
     super();
+    this.#currentSortingType = currentSortingType;
     this.#handleSortingTypeChange = onSortingTypeChange;
     //подписка на событие клик и вызывается обработчик
     document.addEventListener('click', this.#sortingTypeChangeHandler);
   }
 
   get template() {
-    return createSortingTemplate();
+    return createSortingTemplate(this.#currentSortingType);
   }
 
   #sortingTypeChangeHandler = (evt) => {
@@ -52,13 +53,10 @@ export default class SortingView extends AbstractView {
     if(evt.target.tagName !== 'LABEL') {
       return;
     }
-    //отменяем дейсвие по умолчанию
-    //evt.preventDefault();
     //обработчик, которому передаем тип сортировки
     //evt.target - обращаемся к элементу на котором произошло событие
     //dataset - свойство, через которое получаем значение любого дата атрибута
     //SortType - атрибут, к которому обращаемся в разметку
     this.#handleSortingTypeChange(evt.target.dataset.sortType);
   };
-
 }

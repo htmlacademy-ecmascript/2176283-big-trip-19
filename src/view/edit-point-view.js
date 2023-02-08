@@ -28,15 +28,15 @@ const createEditPointTemplate = (point) => {
 
   const pointDestination = destinations.find((item) => destination === item.id);
 
-  const offersTemplate = pointTypeOffer.offers.map((offer) =>{
+  const offersTemplate = pointTypeOffer.offers.map((offer) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${point.id}" type="checkbox" ${checked} name=${offer.title}>
-        <label class="event__offer-label" for="event-offer-luggage-1">
-          <span class="event__offer-title">${offer.title}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}-${offer.id}" type="checkbox" ${checked} name=${offer.title}>
+        <label class="event__offer-label" for="event-${offer.title}-${offer.id}">
+          <span class="event__${offer.title}">${offer.title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offer.price}</span>
+          <span class="event__${offer.price}">${offer.price}</span>
         </label>
       </div>`;
   }).join('');
@@ -140,14 +140,16 @@ export default class EditPointView extends AbstractStatefulView {
 
   #handleFormSubmit = null;
   #handleRollupBtnClick = null;
+  #handleDeleteClick = null;
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({point = BLANK_POINT, onFormSubmit, onRollupBtnClick}) {
+  constructor({point = BLANK_POINT, onFormSubmit, onRollupBtnClick, onDeleteClick}) {
     super();
     this._setState(EditPointView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
     this.#handleRollupBtnClick = onRollupBtnClick;
+    this.#handleDeleteClick = onDeleteClick;
 
     this._restoreHandlers();
   }
@@ -191,6 +193,8 @@ export default class EditPointView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#inputDestinacionHandler);
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#formDeleteClickHandler);
 
     this.#setDatepickerFrom();
 
@@ -248,6 +252,7 @@ export default class EditPointView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        //eslint-disable-next-line
         time_24hr: true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dueDateStartChangeHandler,
@@ -261,12 +266,18 @@ export default class EditPointView extends AbstractStatefulView {
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
+        //eslint-disable-next-line
         time_24hr: true,
         defaultDate: this._state.dateTo,
         onChange: this.#dueDateEndChangeHandler,
       },
     );
   }
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(EditPointView.parseStateToPoint(this._state));
+  };
 
   static parsePointToState(point) {
     return {...point,
