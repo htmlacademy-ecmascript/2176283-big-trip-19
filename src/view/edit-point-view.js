@@ -28,15 +28,15 @@ const createEditPointTemplate = (point) => {
 
   const pointDestination = destinations.find((item) => destination === item.id);
 
-  const offersTemplate = pointTypeOffer.offers.map((offer) =>{
+  const offersTemplate = pointTypeOffer.offers.map((offer) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${point.id}" type="checkbox" ${checked} name=${offer.title}>
-        <label class="event__offer-label" for="event-offer-luggage-1">
-          <span class="event__offer-title">${offer.title}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}-${offer.id}" type="checkbox" ${checked} name=${offer.title}>
+        <label class="event__offer-label" for="event-${offer.title}-${offer.id}">
+          <span class="event__${offer.title}">${offer.title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offer.price}</span>
+          <span class="event__${offer.price}">${offer.price}</span>
         </label>
       </div>`;
   }).join('');
