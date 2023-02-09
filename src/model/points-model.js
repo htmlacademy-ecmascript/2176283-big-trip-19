@@ -2,20 +2,24 @@ import Observable from '../framework/observable.js';
 
 export default class PointsModel extends Observable {
   #pointsApiService = null;
-  #points = null;
+  #points = [];
 
-  constructor({pointsApiService}, points1) {
+  constructor({pointsApiService}) {
     super();
-    this.#points = points1;
     this.#pointsApiService = pointsApiService;
-    this.#pointsApiService.points.then((points) => {
-    //eslint-disable-next-line
-      console.log(points);
-    });
   }
 
   get points() {
     return this.#points;
+  }
+
+  async init() {
+    try {
+      const points = await this.#pointsApiService.points;
+      this.#points = points.map(this.#adaptToClient);
+    } catch(err) {
+      this.#points = [];
+    }
   }
 
   updatePoint(updateType, update) {
@@ -58,4 +62,19 @@ export default class PointsModel extends Observable {
     this._notify(updateType);
   }
 
+  #adaptToClient(point) {
+    const adaptedPoint = {...point,
+      basePrice: point['base_price'],
+      dateFrom: point['date_from'],
+      dateTo: point['date_to'],
+      isFavorite: point['is_favorite'],
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+
+    return adaptedPoint;
+  }
 }
