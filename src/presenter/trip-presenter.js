@@ -2,9 +2,10 @@ import PageView from '../view/page-view.js';
 import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
 import NoPointView from '../view/no-point-veiw.js';
+import LoadingView from '../view/loading-view.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
-import { SortType, UpdateType, UserAction } from '../const.js';
+import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
 
@@ -16,12 +17,16 @@ export default class TripPresenter {
 
   #pageComponent = new PageView();
   #listComponent = new ListView();
+  #loadingComponent = new LoadingView();
   #sortingComponent = null;
   #noPointCompoient = new NoPointView();
 
   #pointPresenter = new Map();
-  //Исходный выбранный вариант сортировки
+  //Исходный выбранный вариант сортировки и фильтрации
   #currentSortingType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
+
+  #isLoading = true;
 
   constructor({listContainer, pointsModel, filterModel})
   {
@@ -34,9 +39,9 @@ export default class TripPresenter {
   }
 
   get points() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const points = this.#pointsModel.points;
-    const filteredPoints = filter[filterType](points);
+    const filteredPoints = filter[this.#filterType](points);
 
     switch(this.#currentSortingType) {
       case SortType.PRICE:
@@ -48,7 +53,7 @@ export default class TripPresenter {
   }
 
   init() {
-    render(this.#pageComponent, this.#listContainer);
+    //render(this.#pageComponent, this.#listContainer);
     this.#renderList();
   }
 
@@ -91,6 +96,11 @@ export default class TripPresenter {
         this.#clearList({resertSortingType: true});
         this.#renderList();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderList();
+        break;
     }
   };
 
@@ -118,6 +128,11 @@ export default class TripPresenter {
     render(this.#sortingComponent, this.#pageComponent.element, RenderPosition.AFTERBEGIN);
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#pageComponent.element,
+      RenderPosition.AFTERBEGIN);
+  }
+
   #renderNoPoints () {
     render(this.#noPointCompoient, this.#pageComponent.element);
   }
@@ -143,6 +158,7 @@ export default class TripPresenter {
     this.#pointPresenter.clear();
 
     remove(this.#sortingComponent);
+    remove(this.#loadingComponent);
     remove(this.#noPointCompoient);
     if (resertSortingType) {
       this.#currentSortingType = SortType.DAY;
@@ -151,6 +167,12 @@ export default class TripPresenter {
 
   #renderList() {
     render(this.#pageComponent, this.#listContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     const pointCount = this.points.length;
     const points = this.points.slice(0, pointCount);
     if (pointCount === 0) {
