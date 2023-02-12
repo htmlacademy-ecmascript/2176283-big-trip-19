@@ -1,5 +1,3 @@
-const TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -26,4 +24,4 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-export { TYPE, FilterType, SortType, UserAction, UpdateType };
+export { FilterType, SortType, UserAction, UpdateType };

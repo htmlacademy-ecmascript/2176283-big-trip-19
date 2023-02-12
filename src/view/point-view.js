@@ -1,8 +1,9 @@
 import AbstractView from '../framework/view/abstract-view.js';
+//import { destinations } from '../mock/points.js';
 import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils/point.js';
-import { offersByType, destinations } from '../mock/points.js';
+//import { offersByType, destinations } from '../mock/points.js';
 
-function createTripPointTemplate(point) {
+function createTripPointTemplate(point, destinations, offersByType) {
   const { basePrice, dateTo, dateFrom, destination, isFavorite, offers, type } = point;
   const dateDay = humanizeTravelDay(dateFrom);
   const dateEnd = humanizeTimeFromTo(dateTo);
@@ -71,12 +72,16 @@ function createTripPointTemplate(point) {
 export default class PointView extends AbstractView {
 
   #point = null;
+  #destinations = null;
+  #offers = null;
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({ point, onEditClick, onFavoriteClick }) {
+  constructor({ point, destinations, offers, onEditClick, onFavoriteClick }) {
     super();
     this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
@@ -88,7 +93,7 @@ export default class PointView extends AbstractView {
   }
 
   get template() {
-    return createTripPointTemplate(this.#point);
+    return createTripPointTemplate(this.#point, this.#destinations, this.#offers);
   }
 
   #editClickHandler = (evt) => {

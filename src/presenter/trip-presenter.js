@@ -10,22 +10,18 @@ import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
 
 export default class TripPresenter {
-
   #listContainer = null;
   #pointsModel = null;
   #filterModel = null;
-
   #pageComponent = new PageView();
   #listComponent = new ListView();
   #loadingComponent = new LoadingView();
   #sortingComponent = null;
   #noPointCompoient = new NoPointView();
-
   #pointPresenter = new Map();
   //Исходный выбранный вариант сортировки и фильтрации
   #currentSortingType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
-
   #isLoading = true;
 
   constructor({listContainer, pointsModel, filterModel})
@@ -40,7 +36,7 @@ export default class TripPresenter {
 
   get points() {
     this.#filterType = this.#filterModel.filter;
-    const points = this.#pointsModel.points;
+    const points = [...this.#pointsModel.points];
     const filteredPoints = filter[this.#filterType](points);
 
     switch(this.#currentSortingType) {
@@ -52,8 +48,15 @@ export default class TripPresenter {
     return filteredPoints;
   }
 
+  get destinations() {
+    return [...this.#pointsModel.destinations];
+  }
+
+  get offers() {
+    return [...this.#pointsModel.offers];
+  }
+
   init() {
-    //render(this.#pageComponent, this.#listContainer);
     this.#renderList();
   }
 
@@ -141,6 +144,8 @@ export default class TripPresenter {
     const pointPresenter = new PointPresenter(
       {
         pointContainer: this.#listComponent.element,
+        destinations: this.destinations,
+        offers:this.offers,
         onDataChange: this.#handleViewAction,
         onModeChange: this.#handleModelChange,
       }
