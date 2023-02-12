@@ -3,8 +3,9 @@ import SortingView from '../view/sorting-view.js';
 import ListView from '../view/list-view.js';
 import NoPointView from '../view/no-point-veiw.js';
 import LoadingView from '../view/loading-view.js';
-import { remove, render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
+import NewPointPresenter from './new-point-presenter.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
 import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
@@ -17,18 +18,25 @@ export default class TripPresenter {
   #listComponent = new ListView();
   #loadingComponent = new LoadingView();
   #sortingComponent = null;
-  #noPointCompoient = new NoPointView();
+  #noPointCompoient = null;
   #pointPresenter = new Map();
+  #newPointPresenter = null;
   //Исходный выбранный вариант сортировки и фильтрации
   #currentSortingType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
 
-  constructor({listContainer, pointsModel, filterModel})
+  constructor({listContainer, pointsModel, filterModel, onNewPointDestroy})
   {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+
+    this.#newPointPresenter = new NewPointPresenter({
+      pointContainer: this.#listComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: onNewPointDestroy
+    });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -60,7 +68,14 @@ export default class TripPresenter {
     this.#renderList();
   }
 
+  createPoint() {
+    this.#currentSortingType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+  }
+
+
   #handleModelChange = () => {
+    this.#newPointPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
@@ -137,7 +152,10 @@ export default class TripPresenter {
   }
 
   #renderNoPoints () {
-    render(this.#noPointCompoient, this.#pageComponent.element);
+    this.#noPointCompoient = new NoPointView({
+      filterType: this.#filterType
+    });
+    render(this.#noPointCompoient, this.#pageComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #renderPoint(point) {
@@ -159,12 +177,17 @@ export default class TripPresenter {
   }
 
   #clearList({ resertSortingType = false } = {}) {
+    this.#newPointPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
 
     remove(this.#sortingComponent);
-    remove(this.#loadingComponent);
     remove(this.#noPointCompoient);
+
+    if (this.#noPointCompoient) {
+      remove(this.#loadingComponent);
+    }
+
     if (resertSortingType) {
       this.#currentSortingType = SortType.DAY;
     }
