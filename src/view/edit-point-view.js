@@ -1,23 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeTimeEdit } from '../utils/point.js';
-import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
-
-const addDays = 3;
-const START_DATE = dayjs().toISOString();
-const END_DATE = dayjs().add((addDays),'day').toISOString();
-
-const BLANK_POINT = {
-  basePrice: 0,
-  dateFrom: START_DATE,
-  dateTo: END_DATE,
-  destination: 0,
-  id: 0,
-  offers: [],
-  type: 'taxi'
-};
 
 const createEditPointTemplate = (point, destinations, offersByType) => {
   const { basePrice, dateTo, dateFrom, offers, destination, type, id } = point;
@@ -145,7 +130,7 @@ export default class EditPointView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({point = BLANK_POINT, destinations, offers, onFormSubmit, onRollupBtnClick, onDeleteClick}) {
+  constructor({point, destinations, offers, onFormSubmit, onRollupBtnClick, onDeleteClick}) {
     super();
     this.#destinations = destinations;
     this.#offers = offers;

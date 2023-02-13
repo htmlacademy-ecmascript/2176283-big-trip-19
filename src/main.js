@@ -4,13 +4,15 @@ import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
 import PointsApiService from './points-api-service.js';
 import NewPointButtonView from './view/new-point-button-view.js';
-import { render } from './framework/render.js';
 
 const AUTHORIZATION = 'Basic er883jdzbdw';
-const END_POINT = 'https://19.ecmascript.pages.academy/big-trip/';
+const END_POINT = 'https://19.ecmascript.pages.academy/big-trip';
 
+const mainElement = document.querySelector('.trip-main');
 const tripListFilterElement = document.querySelector('.trip-controls__filters');
 const tripListElement = document.querySelector('.trip-events');
+
+const filterModel = new FilterModel();
 
 const pointsModel = new PointsModel(
   {
@@ -19,14 +21,12 @@ const pointsModel = new PointsModel(
   },
 );
 
-const filterModel = new FilterModel();
-
 const tripPresenter = new TripPresenter(
   {
     listContainer: tripListElement,
     pointsModel,
     filterModel,
-    onNewPointDestroy: handleNewPointFormClose
+    newPointButtonContainer: mainElement,
   }
 );
 
@@ -37,12 +37,9 @@ const filterPresenter = new FilterPresenter({
 });
 
 const newPointButtonComponent = new NewPointButtonView({
+  newContainer: tripListElement,
   onClick: handleNewPointButtonClick
 });
-
-function handleNewPointFormClose() {
-  newPointButtonComponent.element.disabled = false;
-}
 
 function handleNewPointButtonClick() {
   tripPresenter.createPoint();
@@ -51,7 +48,4 @@ function handleNewPointButtonClick() {
 
 filterPresenter.init();
 tripPresenter.init();
-pointsModel.init()
-  .finally(() =>{
-    render(newPointButtonComponent, tripListElement);
-  });
+pointsModel.init();

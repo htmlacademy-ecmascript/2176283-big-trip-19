@@ -7,6 +7,9 @@ export default class NewPointPresenter {
   #pointContainer = null;
   #handleDataChange = null;
   #handleDestroy = null;
+  #point = null;
+  #destinations = [];
+  #offers = [];
 
   #editPointComponent = null;
 
@@ -16,17 +19,25 @@ export default class NewPointPresenter {
     this.#handleDestroy = onDestroy;
   }
 
-  init() {
+  init(point, destinations, offers) {
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
+
     if (this.#editPointComponent !== null){
       return;
     }
 
     this.#editPointComponent = new EditPointView({
+      point: this.#point,
+      destinations: this.#destinations,
+      offers: this.#offers,
       onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick
+      onDeleteClick: this.#handleDeleteClick,
     });
 
-    render(this.#editPointComponent, this.#pointContainer, RenderPosition.AFTERBEGIN);
+    render(this.#editPointComponent, this.#pointContainer,
+      RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -35,6 +46,7 @@ export default class NewPointPresenter {
     if(this.#editPointComponent === null) {
       return;
     }
+
     this.#handleDestroy();
 
     remove(this.#editPointComponent);
