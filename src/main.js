@@ -2,24 +2,23 @@ import TripPresenter from './presenter/trip-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
-import { getRandomPoint } from './mock/points.js';
 import PointsApiService from './points-api-service.js';
-
+import NewPointButtonView from './view/new-point-button-view.js';
+import { render, RenderPosition } from './framework/render.js';
 const AUTHORIZATION = 'Basic er883jdzbdw';
-const END_TASK = 'https://19.ecmascript.pages.academy/big-trip/';
+const END_POINT = 'https://19.ecmascript.pages.academy/big-trip';
 
-const NUMBER_OF_WAYPOINTS = 5;
-const mockPoints = Array.from({length: NUMBER_OF_WAYPOINTS}, getRandomPoint);
-
+const mainElement = document.querySelector('.trip-main');
 const tripListFilterElement = document.querySelector('.trip-controls__filters');
 const tripListElement = document.querySelector('.trip-events');
+
 const filterModel = new FilterModel();
 
 const pointsModel = new PointsModel(
-  {pointsApiService: new PointsApiService(END_TASK, AUTHORIZATION)
+  {
+    pointsApiService:
+    new PointsApiService(END_POINT, AUTHORIZATION)
   },
-  mockPoints,
-  filterModel,
 );
 
 const tripPresenter = new TripPresenter(
@@ -27,6 +26,7 @@ const tripPresenter = new TripPresenter(
     listContainer: tripListElement,
     pointsModel,
     filterModel,
+    onNewPointDestroy: handleNewPointFormClose,
   }
 );
 
@@ -36,5 +36,23 @@ const filterPresenter = new FilterPresenter({
   pointsModel
 });
 
+const newPointButtonComponent = new NewPointButtonView({
+  newContainer: tripListElement,
+  onClick: handleNewPointButtonClick
+});
+
+function handleNewPointFormClose () {
+  newPointButtonComponent.element.disabled = false;
+}
+
+function handleNewPointButtonClick() {
+  tripPresenter.createPoint();
+  newPointButtonComponent.element.disabled = true;
+}
+
 filterPresenter.init();
 tripPresenter.init();
+pointsModel.init()
+  .finally(() => {
+    render(newPointButtonComponent, mainElement, RenderPosition.BEFOREEND);
+  });

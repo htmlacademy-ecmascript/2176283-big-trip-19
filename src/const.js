@@ -1,4 +1,18 @@
-const TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+import dayjs from 'dayjs';
+
+const addDays = 3;
+const START_DATE = dayjs().toISOString();
+const END_DATE = dayjs().add((addDays),'day').toISOString();
+
+const BLANK_POINT = {
+  basePrice: 0,
+  dateFrom: START_DATE,
+  dateTo: END_DATE,
+  destination: 0,
+  id: 0,
+  offers: [],
+  type: 'taxi'
+};
 
 const FilterType = {
   EVERYTHING: 'everything',
@@ -23,6 +37,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
-export { TYPE, FilterType, SortType, UserAction, UpdateType };
+export { FilterType, SortType, UserAction, UpdateType, BLANK_POINT };
