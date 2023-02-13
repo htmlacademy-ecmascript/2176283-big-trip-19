@@ -1,7 +1,6 @@
+import he from 'he';
 import AbstractView from '../framework/view/abstract-view.js';
-//import { destinations } from '../mock/points.js';
 import { humanizeTimeFromTo, humanizeTravelDay, humanizeTravelTime } from '../utils/point.js';
-//import { offersByType, destinations } from '../mock/points.js';
 
 function createTripPointTemplate(point, destinations, offersByType) {
   const { basePrice, dateTo, dateFrom, destination, isFavorite, offers, type } = point;
@@ -40,7 +39,7 @@ function createTripPointTemplate(point, destinations, offersByType) {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${pointDestination.name}</h3>
+      <h3 class="event__title">${type} ${he.encode(pointDestination.name)}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${dateStart}</time>

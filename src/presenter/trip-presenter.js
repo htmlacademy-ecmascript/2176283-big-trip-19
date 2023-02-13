@@ -9,7 +9,6 @@ import { remove, render, RenderPosition } from '../framework/render.js';
 import { FilterType, SortType, UpdateType, UserAction, BLANK_POINT } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
-import EditPointView from '../view/edit-point-view.js';
 
 export default class TripPresenter {
   #listContainer = null;
@@ -22,24 +21,21 @@ export default class TripPresenter {
   #noPointCompoient = null;
   #pointPresenter = new Map();
   #newPointPresenter = null;
-  #newPointButtonContainer = null;
-  #newPointButtonComponent = null;
   //Исходный выбранный вариант сортировки и фильтрации
   #currentSortingType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
 
-  constructor({listContainer, pointsModel, filterModel, newPointButtonContainer})
+  constructor({listContainer, pointsModel, filterModel, onNewPointDestroy})
   {
     this.#listContainer = listContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
-    this.#newPointButtonContainer = newPointButtonContainer;
 
     this.#newPointPresenter = new NewPointPresenter({
       pointContainer: this.#listComponent.element,
       onDataChange: this.#handleViewAction,
-      onDestroy: this.#handleNewPointFormClose
+      onDestroy: onNewPointDestroy
     });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
@@ -72,11 +68,11 @@ export default class TripPresenter {
     this.#renderList();
   }
 
-  createPoint() {
+  createPoint(destinations, offers) {
     const point = BLANK_POINT;
     this.#currentSortingType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newPointPresenter.init(point, this.destinations, this.offers);
+    this.#newPointPresenter.init(point, destinations, offers);
   }
 
 
@@ -188,7 +184,6 @@ export default class TripPresenter {
     this.#pointPresenter.clear();
 
     remove(this.#sortingComponent);
-    //remove(this.#noPointCompoient);
 
     if (this.#noPointCompoient) {
       remove(this.#noPointCompoient);
@@ -198,12 +193,6 @@ export default class TripPresenter {
       this.#currentSortingType = SortType.DAY;
     }
   }
-
-
-  #handleNewPointFormClose = () => {
-    this.#newPointButtonComponent.element.disabled = false;
-  };
-
 
   #renderList() {
     render(this.#pageComponent, this.#listContainer);
