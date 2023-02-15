@@ -9,6 +9,12 @@ import { remove, render, RenderPosition } from '../framework/render.js';
 import { FilterType, SortType, UpdateType, UserAction, BLANK_POINT } from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class TripPresenter {
   #listContainer = null;
@@ -25,6 +31,10 @@ export default class TripPresenter {
   #currentSortingType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({listContainer, pointsModel, filterModel, onNewPointDestroy})
   {
@@ -82,6 +92,7 @@ export default class TripPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     // Вызываем обновление модели.
     // actionType - действие пользователя чтобы понять какой метод модели вызвать
     // updateType - тип изменений чтобы понять что после действия нужно обновить
@@ -112,6 +123,7 @@ export default class TripPresenter {
         }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
