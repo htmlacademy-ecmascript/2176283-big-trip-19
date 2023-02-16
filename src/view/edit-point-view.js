@@ -6,11 +6,10 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const createEditPointTemplate = (point, destinations, offersByType) => {
-  const { basePrice, dateTo, dateFrom, offers, destination, type, id, isSaving, isDeleting , isDisabled} = point;
+  const { basePrice, dateTo, dateFrom, offers, destination, type, id, isSaving, isDeleting , isDisabled } = point;
   const dateEnd = humanizeTimeEdit(dateTo);
   const dateStart = humanizeTimeEdit(dateFrom);
   const pointTypeOffer = offersByType.find((offer) => offer.type === point.type);
-  const price = String(basePrice);
   const pointDestination = destinations.find((item) => destination === item.id);
 
   const offersTemplate = pointTypeOffer.offers.map((offer) => {
@@ -89,7 +88,7 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${he.encode(price)}" ${isDisabled ? 'disabled' : ''}>
+        <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${he.encode(String(basePrice))}" ${isDisabled ? 'disabled' : ''}>
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'saving...' : 'save'}</button>
@@ -182,6 +181,10 @@ export default class EditPointView extends AbstractStatefulView {
 
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#inputDestinationHandler);
+
+    this.element.querySelector('.event__input--price')
+      .addEventListener('change', this.#onPriceChange);
+
     this.element.querySelector('.event__reset-btn')
       .addEventListener('click', this.#formDeleteClickHandler);
 
@@ -232,6 +235,13 @@ export default class EditPointView extends AbstractStatefulView {
         destination: newDestination.id,
       });
     }
+  };
+
+  #onPriceChange = (evt) => {
+    if(evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    this._state = {...this._state, basePrice: Number(evt.target.value)};
   };
 
   #setDatepickerFrom() {
