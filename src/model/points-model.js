@@ -6,6 +6,7 @@ export default class PointsModel extends Observable {
   #points = [];
   #destinations = [];
   #offers = [];
+  #citys = [];
 
   constructor({pointsApiService}) {
     super();
@@ -23,6 +24,12 @@ export default class PointsModel extends Observable {
 
   get offers() {
     return this.#offers;
+  }
+
+  get citys() {
+    const citys = [];
+    this.#destinations.forEach((destination) => citys.push(destination.name));
+    return citys;
   }
 
   async init() {

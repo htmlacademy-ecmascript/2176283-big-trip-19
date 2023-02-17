@@ -18,13 +18,15 @@ export default class PointPresenter {
   #editPointComponent = null;
   #point = null;
   #offers = null;
+  #citys = null;
   #destinations = null;
   #mode = Mode.VIEW;
 
-  constructor({pointContainer, destinations, offers, onDataChange, onModeChange}) {
+  constructor({pointContainer, destinations, offers, citys, onDataChange, onModeChange}) {
     this.#pointContainer = pointContainer;
     this.#destinations = destinations;
     this.#offers = offers;
+    this.#citys = citys;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
@@ -46,6 +48,7 @@ export default class PointPresenter {
       point: this.#point,
       destinations: this.#destinations,
       offers: this.#offers,
+      citys: this.#citys,
       onFormSubmit: this.#handleFormSubmit,
       onRollupBtnClick: this.#handleRollupBtnClick,
       onDeleteClick: this.#handleDeleteClick,

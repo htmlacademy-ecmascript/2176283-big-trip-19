@@ -74,15 +74,19 @@ export default class TripPresenter {
     return [...this.#pointsModel.offers];
   }
 
+  get citys() {
+    return [...this.#pointsModel.citys];
+  }
+
   init() {
     this.#renderList();
   }
 
-  createPoint(destinations, offers) {
+  createPoint(destinations, offers, citys) {
     const point = BLANK_POINT;
     this.#currentSortingType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newPointPresenter.init(point, destinations, offers);
+    this.#newPointPresenter.init(point, destinations, offers, citys);
   }
 
 
@@ -192,7 +196,8 @@ export default class TripPresenter {
       {
         pointContainer: this.#listComponent.element,
         destinations: this.destinations,
-        offers:this.offers,
+        offers: this.offers,
+        citys: this.citys,
         onDataChange: this.#handleViewAction,
         onModeChange: this.#handleModelChange,
       }

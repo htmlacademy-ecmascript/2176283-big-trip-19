@@ -11,6 +11,7 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
   const dateStart = humanizeTimeEdit(dateFrom);
   const pointTypeOffer = offersByType.find((offer) => offer.type === point.type);
   const pointDestination = destinations.find((item) => destination === item.id);
+  const destinationName = destination !== null ? pointDestination.name : '';
 
   const offersTemplate = pointTypeOffer.offers.map((offer) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
@@ -25,7 +26,7 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
       </div>`;
   }).join('');
 
-  const destinationPoint = destinations.map((element) =>`<option value="${element.name}"></option>`).join('');
+  const destinationPoint = destinations.map((city) => `<option value="${he.encode(city.name)}"></option>`).join('');
 
   const iconTypeTemplate = offersByType.map((element) =>
     `<div class="event__type-item">
@@ -69,9 +70,9 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
         <label class="event__label  event__type-output" for="event-destination-${id}">
           ${he.encode(type)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${he.encode(pointDestination.name)}" list="destination-list-${id}">
+        <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${he.encode(destinationName)}" list="destination-list-${id}">
         <datalist id="destination-list-${id}">
-          ${he.encode(destinationPoint)}
+          ${destinationPoint}
         </datalist>
       </div>
 
@@ -124,16 +125,18 @@ export default class EditPointView extends AbstractStatefulView {
 
   #destinations = null;
   #offers = null;
+  #citys = null;
   #handleFormSubmit = null;
   #handleRollupBtnClick = null;
   #handleDeleteClick = null;
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({point, destinations, offers, onFormSubmit, onRollupBtnClick, onDeleteClick}) {
+  constructor({point, destinations, offers, citys, onFormSubmit, onRollupBtnClick, onDeleteClick}) {
     super();
     this.#destinations = destinations;
     this.#offers = offers;
+    this.#citys = citys;
     this._setState(EditPointView.parsePointToState(point));
     this.#handleFormSubmit = onFormSubmit;
     this.#handleRollupBtnClick = onRollupBtnClick;
@@ -227,13 +230,12 @@ export default class EditPointView extends AbstractStatefulView {
 
   #inputDestinationHandler = (evt) => {
     evt.preventDefault();
-    if (evt.target.tagName === 'INPUT') {
-      const newDestinationName = evt.target.value;
-      const newDestination = this.#destinations.find(({ name }) => name === newDestinationName);
-
+    if (evt.target.value && this.#citys.includes(evt.target.value)) {
       this.updateElement({
-        destination: newDestination.id,
+        destination: this.#citys.indexOf(evt.target.value) + 1,
       });
+    } else {
+      evt.target.value = '';
     }
   };
 
