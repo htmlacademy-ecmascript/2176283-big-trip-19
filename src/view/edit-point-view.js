@@ -17,7 +17,7 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
     const checked = offers.includes(offer.id) ? 'checked' : '';
     return `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}-${offer.id}" ${isDisabled ? 'disabled' : ''} type="checkbox" ${checked} name=${offer.title}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}-${offer.id}" ${isDisabled ? 'disabled' : ''} type="checkbox" ${checked} value = ${offer.id} name=${offer.title}  ${isDisabled ? 'disabled' : ''}>
         <label class="event__offer-label" for="event-${offer.title}-${offer.id}">
           <span class="event__${offer.title}">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -30,8 +30,8 @@ const createEditPointTemplate = (point, destinations, offersByType) => {
 
   const iconTypeTemplate = offersByType.map((element) =>
     `<div class="event__type-item">
-      <input id="event-${element.type}-${element.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}">
-      <label class="event__type-label  event__type-label--${element.type}" for="event-${element.type}-${element.id}">${element.type}</label>
+      <input id="event-type-${element.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${element.type}" ${element.type === type ? 'checked' : ''}>
+      <label class="event__type-label  event__type-label--${element.type}" for="event-type-${element.type}-1">${element.type}</label>
     </div>`
   ).join('');
 
@@ -182,6 +182,9 @@ export default class EditPointView extends AbstractStatefulView {
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeLabelHandler);
 
+    this.element.querySelector('.event__available-offers')
+      .addEventListener('change', this.#onOffersChangeHandler);
+
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#inputDestinationHandler);
 
@@ -236,6 +239,30 @@ export default class EditPointView extends AbstractStatefulView {
       });
     } else {
       evt.target.value = '';
+    }
+  };
+
+  #onOffersChangeHandler = (evt) => {
+    evt.preventDefault();
+    const index = this._state.offers.findIndex((offers) => String(offers) === evt.target.value);
+    if (index !== -1) {
+      this._state.offers = [
+        ...this._state.offers.slice(0, index),
+        ...this._state.offers.slice(index + 1),
+      ];
+    }
+    else {
+      this._state.offers = [
+        Number(evt.target.value),
+        ...this._state.offers,
+      ];
+    }
+
+    if (this.#offers) {
+      this.updateElement({
+        ...this._state,
+        offers: this._state.offers,
+      });
     }
   };
 
