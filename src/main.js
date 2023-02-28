@@ -37,7 +37,7 @@ const filterPresenter = new FilterPresenter({
 });
 
 const newPointButtonComponent = new NewPointButtonView({
-  newContainer: tripListElement,
+  //newContainer: tripListElement,
   onClick: handleNewPointButtonClick
 });
 
@@ -46,12 +46,12 @@ function handleNewPointFormClose () {
 }
 
 function handleNewPointButtonClick() {
-  tripPresenter.createPoint();
+  tripPresenter.createPoint(pointsModel);
   newPointButtonComponent.element.disabled = true;
 }
 
 filterPresenter.init();
-tripPresenter.init();
+tripPresenter.init(pointsModel);
 pointsModel.init()
   .finally(() => {
     render(newPointButtonComponent, mainElement, RenderPosition.BEFOREEND);

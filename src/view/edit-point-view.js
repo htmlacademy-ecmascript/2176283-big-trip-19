@@ -6,7 +6,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const createEditPointTemplate = (point, destinations, offersByType) => {
-  const { basePrice, dateTo, dateFrom, offers, destination, type, id, isSaving, isDeleting , isDisabled } = point;
+  const { basePrice, dateTo, dateFrom, offers, destination, type, id, isSaving, isDeleting, isDisabled } = point;
   const dateEnd = humanizeTimeEdit(dateTo);
   const dateStart = humanizeTimeEdit(dateFrom);
   const pointTypeOffer = offersByType.find((offer) => offer.type === point.type);

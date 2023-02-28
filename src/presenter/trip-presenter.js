@@ -6,7 +6,7 @@ import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { FilterType, SortType, UpdateType, UserAction, BLANK_POINT } from '../const.js';
+import { FilterType, SortType, UpdateType, UserAction/*, BLANK_POINT */} from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
@@ -78,15 +78,14 @@ export default class TripPresenter {
     return [...this.#pointsModel.citys];
   }
 
-  init() {
-    this.#renderList();
+  init({destinations, offers}) {
+    this.#renderList(destinations, offers);
   }
 
-  createPoint(destinations, offers, citys) {
-    const point = BLANK_POINT;
+  createPoint({destinations, offers}) {
     this.#currentSortingType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newPointPresenter.init(point, destinations, offers, citys);
+    this.#newPointPresenter.init(destinations, offers);
   }
 
 
