@@ -6,9 +6,15 @@ import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { FilterType, SortType, UpdateType, UserAction, BLANK_POINT } from '../const.js';
+import { FilterType, SortType, UpdateType, UserAction/*, BLANK_POINT */} from '../const.js';
 import { sortPriceDown, sortTimeDown } from '../utils/point.js';
 import { filter } from '../utils/filter.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class TripPresenter {
   #listContainer = null;
@@ -25,6 +31,10 @@ export default class TripPresenter {
   #currentSortingType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({listContainer, pointsModel, filterModel, onNewPointDestroy})
   {
@@ -64,15 +74,18 @@ export default class TripPresenter {
     return [...this.#pointsModel.offers];
   }
 
-  init() {
-    this.#renderList();
+  get citys() {
+    return [...this.#pointsModel.citys];
   }
 
-  createPoint(destinations, offers) {
-    const point = BLANK_POINT;
+  init({destinations, offers}) {
+    this.#renderList(destinations, offers);
+  }
+
+  createPoint({destinations, offers}) {
     this.#currentSortingType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newPointPresenter.init(point, destinations, offers);
+    this.#newPointPresenter.init(destinations, offers);
   }
 
 
@@ -81,22 +94,39 @@ export default class TripPresenter {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     // Вызываем обновление модели.
     // actionType - действие пользователя чтобы понять какой метод модели вызвать
     // updateType - тип изменений чтобы понять что после действия нужно обновить
     // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#pointPresenter.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#newPointPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#pointPresenter.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -165,7 +195,8 @@ export default class TripPresenter {
       {
         pointContainer: this.#listComponent.element,
         destinations: this.destinations,
-        offers:this.offers,
+        offers: this.offers,
+        citys: this.citys,
         onDataChange: this.#handleViewAction,
         onModeChange: this.#handleModelChange,
       }

@@ -1,8 +1,14 @@
 import dayjs from 'dayjs';
-
+import Duration from 'dayjs/plugin/duration';
+dayjs.extend(Duration);
 const DATE_FORMAT = 'MMM DD';
 const TIME_FORMAT = 'HH:mm';
 const EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
+const DURATION_LESS_THAN_AN_HOUR = 'mm[M]';
+const DURATION_LESS_THAN_A_DAY = 'HH[H] mm[M]';
+const DURATION_OF_MORE_THAN_A_DAY = 'DD[D] HH[H] mm[M]';
+const MILLISECONDS_AMOUNT_IN_HOUR = 3600000;
+const MILLISECONDS_AMOUNT_IN_DAY = 86400000;
 
 function humanizeTravelDay(dateFrom) {
   return dateFrom ? dayjs(dateFrom).format(DATE_FORMAT) : '';
@@ -17,7 +23,20 @@ function humanizeTimeEdit(dateTime) {
 }
 
 function humanizeTravelTime(from, to) {
-  return dayjs(to).diff(dayjs(from), 'h');
+
+  const eventDuration = dayjs(to).diff(dayjs(from));
+
+  if (eventDuration > MILLISECONDS_AMOUNT_IN_DAY) {
+    return dayjs.duration(eventDuration).format(DURATION_OF_MORE_THAN_A_DAY);
+  }
+
+  if (eventDuration < MILLISECONDS_AMOUNT_IN_DAY) {
+    return dayjs.duration(eventDuration).format(DURATION_LESS_THAN_A_DAY);
+  }
+
+  if (eventDuration < MILLISECONDS_AMOUNT_IN_HOUR) {
+    return dayjs.duration(eventDuration).format(DURATION_LESS_THAN_AN_HOUR);
+  }
 }
 
 function isPointfuture(dateFrom) {

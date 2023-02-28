@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createPageTemplate() {
-  return (`<main class="page-body__page-main  page-main">
+  return (`<main class="page-body">
   </main>`);
 }
 

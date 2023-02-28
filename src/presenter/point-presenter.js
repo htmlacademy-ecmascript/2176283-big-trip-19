@@ -18,13 +18,15 @@ export default class PointPresenter {
   #editPointComponent = null;
   #point = null;
   #offers = null;
+  #citys = null;
   #destinations = null;
   #mode = Mode.VIEW;
 
-  constructor({pointContainer, destinations, offers, onDataChange, onModeChange}) {
+  constructor({pointContainer, destinations, offers, citys, onDataChange, onModeChange}) {
     this.#pointContainer = pointContainer;
     this.#destinations = destinations;
     this.#offers = offers;
+    this.#citys = citys;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
@@ -46,6 +48,7 @@ export default class PointPresenter {
       point: this.#point,
       destinations: this.#destinations,
       offers: this.#offers,
+      citys: this.#citys,
       onFormSubmit: this.#handleFormSubmit,
       onRollupBtnClick: this.#handleRollupBtnClick,
       onDeleteClick: this.#handleDeleteClick,
@@ -61,7 +64,8 @@ export default class PointPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#editPointComponent, prevEditPointComponent);
+      replace(this.#pointComponent, prevEditPointComponent);
+      this.#mode = Mode.VIEW;
     }
 
     remove(prevPointComponent);
@@ -77,6 +81,41 @@ export default class PointPresenter {
     if (this.#mode !== Mode.VIEW) {
       this.#replaceFormEditToPoint();
     }
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editPointComponent.shake(resetFormState);
   }
 
   #replacePointToFormEdit() {
@@ -110,7 +149,6 @@ export default class PointPresenter {
       UpdateType.MINOR,
       point,
     );
-    this.#replaceFormEditToPoint();
   };
 
   #handleRollupBtnClick = () => {
